@@ -1,48 +1,65 @@
-# Educational 2D Molecular Dynamics Simulations
+# Educational 2D/3D Molecular Dynamics Simulations
 
-**Interactive 2D MD simulations using GROMOS-RS refined interactions for teaching and learning molecular dynamics**
+**Interactive 2D/3D MD simulations with movie rendering using GROMOS-RS refined interactions for teaching and learning molecular dynamics**
 
 ---
 
 ## Overview
 
-This educational package provides simplified 2D molecular dynamics simulations that demonstrate fundamental concepts in molecular simulation using the refined force field interactions from **gromos-rs**. By working in 2D rather than 3D, students and researchers can more easily visualize and understand:
+This educational package provides simplified 2D and 3D molecular dynamics simulations that demonstrate fundamental concepts in molecular simulation using the refined force field interactions from **gromos-rs**. By working in 2D and 3D with easy visualization and movie creation, students and researchers can:
 
-- Molecular forces and potentials
-- Energy conservation and conversion
-- Temperature and thermodynamics
-- Structural transitions (gas → liquid → solid)
-- Polymer physics
-- Protein folding basics
+- **Visualize** molecular forces and potentials in real-time
+- **Understand** energy conservation and conversion
+- **Explore** temperature and thermodynamics
+- **Observe** structural transitions (gas → liquid → solid)
+- **Study** polymer physics and protein folding
+- **Create** movies and animations for presentations
+- **Compare** 2D vs 3D behavior side-by-side
 
 ## Features
 
-✨ **Core Simulation Engine**
-- 2D projection of GROMOS force field interactions
+✨ **Core Simulation Engine (2D & 3D)**
+- Full GROMOS force field interactions
 - Lennard-Jones (van der Waals) interactions
 - Harmonic bonds and angle potentials
 - Velocity Verlet and Leap-Frog integrators
 - Berendsen thermostat for temperature control
 - Periodic boundary conditions
+- **NEW: 3D simulation support with same physics**
 
 🎨 **Real-Time Visualization**
-- Matplotlib-based rendering
+- Matplotlib-based 2D/3D rendering
 - Particle trajectories (trails)
 - Energy plots
 - Force/velocity vectors
 - Customizable colors and styles
+- **NEW: Interactive 3D rotation and zoom**
+- **NEW: Rotating camera views**
 
-📚 **Educational Examples**
+🎬 **Movie Rendering**
+- **MP4 video export** (ffmpeg)
+- **Animated GIF creation** (Pillow)
+- **Frame sequence export**
+- **Rotating 3D views**
+- **Side-by-side comparisons**
+- Easy one-line movie creation
+
+📚 **Educational Examples (2D)**
 1. Gas in a box (ideal gas behavior)
 2. Liquid droplet formation (phase separation)
 3. Crystal lattice (solid-liquid-gas transitions)
 4. Polymer chain dynamics (conformational sampling)
 5. Protein folding (hydrophobic collapse)
 
+🔮 **Educational Examples (3D)**
+6. Gas in a cube (3D ideal gas with rotation)
+7. Water-like molecule (molecular vibrations in 3D)
+
 📓 **Interactive Notebooks**
 - Jupyter notebooks with step-by-step explanations
 - Interactive parameter exploration
 - Hands-on exercises
+- Lennard-Jones potential deep-dive
 
 ---
 
@@ -54,6 +71,14 @@ This educational package provides simplified 2D molecular dynamics simulations t
 # Python 3.8+
 # Required packages:
 pip install numpy matplotlib jupyter
+
+# For movie creation (optional but recommended):
+pip install Pillow  # For GIF animations
+
+# For MP4 videos (requires ffmpeg):
+conda install -c conda-forge ffmpeg
+# or on Ubuntu/Debian:
+# sudo apt-get install ffmpeg
 ```
 
 ### Optional: GROMOS-RS Python Bindings
@@ -76,20 +101,19 @@ The educational simulations use standalone implementations but can leverage grom
 ```bash
 cd examples/
 
-# Example 1: Gas in a Box
-python 01_gas_in_box.py
+# 2D Examples
+python 01_gas_in_box.py          # Gas in a box
+python 02_liquid_droplet.py      # Liquid droplet formation
+python 03_crystal_lattice.py     # Crystal lattice
+python 04_polymer_chain.py       # Polymer chain dynamics
+python 05_protein_folding_2d.py  # Protein folding (HP model)
 
-# Example 2: Liquid Droplet
-python 02_liquid_droplet.py
+# 3D Examples
+python 06_3d_gas_cube.py         # 3D gas with rotation
+python 07_3d_molecule.py         # Water-like molecule vibrations
 
-# Example 3: Crystal Lattice
-python 03_crystal_lattice.py
-
-# Example 4: Polymer Chain
-python 04_polymer_chain.py
-
-# Example 5: Protein Folding
-python 05_protein_folding_2d.py
+# Movie Creation
+python movie_demo_2d.py          # Create MP4s and GIFs
 ```
 
 ### Interactive Notebooks
@@ -97,6 +121,21 @@ python 05_protein_folding_2d.py
 ```bash
 cd notebooks/
 jupyter notebook 01_interactive_lennard_jones.ipynb
+```
+
+### Creating Movies (One-Liner!)
+
+```python
+from core import Simulation2D, Renderer2D, make_quick_movie
+
+# Setup simulation
+sim = Simulation2D(box_size=(5.0, 5.0))
+renderer = Renderer2D(box_size=(5.0, 5.0))
+
+# ... add particles, initialize ...
+
+# Create movie in one line!
+make_quick_movie(sim, renderer, n_steps=1000, filename='my_simulation.mp4')
 ```
 
 ### Creating Your Own Simulation
@@ -251,6 +290,137 @@ python examples/05_protein_folding_2d.py
 
 ---
 
+## NEW: Movie Creation 🎬
+
+### Quick Movie Creation
+
+Create publication-quality movies with a single function call:
+
+```python
+from core import make_quick_movie, make_gif_animation, make_high_quality_movie
+
+# MP4 video (requires ffmpeg)
+make_quick_movie(sim, renderer, n_steps=1000, filename='simulation.mp4')
+
+# Animated GIF (requires Pillow)
+make_gif_animation(sim, renderer, n_steps=500, filename='animation.gif')
+
+# High-quality video (60 FPS, high DPI)
+make_high_quality_movie(sim, renderer, n_steps=500, filename='hq.mp4')
+```
+
+### Advanced Movie Options
+
+```python
+from core.movie_utils import record_simulation_movie
+
+record_simulation_movie(
+    sim, renderer,
+    n_steps=2000,
+    output_file='custom.mp4',
+    render_interval=2,      # Render every 2 steps (faster)
+    fps=30,                  # Frames per second
+    dpi=150,                 # Resolution
+    show_bonds=True,
+    progress_interval=100
+)
+```
+
+### Rotating 3D Movies
+
+```python
+from core.movie_utils import make_rotating_3d_movie
+
+# Create 360° rotating view of 3D system
+make_rotating_3d_movie(
+    sim3d, renderer3d,
+    n_frames=360,
+    output_file='rotation.mp4',
+    elevation=30,
+    fps=30
+)
+```
+
+### Movie Formats
+
+| Format | Use Case | Requirements |
+|--------|----------|--------------|
+| **MP4** | Presentations, video players | ffmpeg |
+| **GIF** | Websites, documentation | Pillow |
+| **Frames** | Custom post-processing | None |
+
+---
+
+## NEW: 3D Simulations 🔮
+
+### 3D Gas Simulation
+
+```python
+from core import Simulation3D, Renderer3D
+
+# Create 3D simulation
+sim = Simulation3D(
+    box_size=(5.0, 5.0, 5.0),  # Cubic box
+    periodic=True,
+    integrator='velocity-verlet',
+    dt=0.002
+)
+
+# Add particles in 3D
+for i in range(50):
+    sim.add_particle(position=[x, y, z], color='blue')
+
+sim.initialize_velocities(300.0)  # 300 K
+
+# Create 3D renderer
+renderer = Renderer3D(
+    box_size=(5.0, 5.0, 5.0),
+    azimuth=45,     # Viewing angle
+    elevation=30
+)
+
+# Run with visualization
+for step in range(1000):
+    sim.integrate_step()
+
+    if step % 10 == 0:
+        # Optionally rotate view during simulation
+        azimuth = 45 + (360 * step / 1000)
+        renderer.render(sim, azimuth=azimuth)
+```
+
+### Interactive 3D Rendering
+
+```python
+from core.renderer3d import InteractiveRenderer3D
+
+# Create interactive renderer
+renderer = InteractiveRenderer3D(box_size=(5.0, 5.0, 5.0))
+
+# Run simulation
+for step in range(1000):
+    sim.integrate_step()
+    if step % 5 == 0:
+        renderer.render(sim)
+
+# User can:
+# - Click and drag to rotate
+# - Scroll to zoom
+# - Fully interactive matplotlib 3D view
+```
+
+### 3D vs 2D Comparison
+
+| Feature | 2D | 3D |
+|---------|----|----|
+| Degrees of freedom | 2 per particle | 3 per particle |
+| Equipartition | ⟨KE⟩ = k_B T | ⟨KE⟩ = 3/2 k_B T |
+| Visualization | Easy to see all particles | Requires rotation |
+| Performance | Faster | Slightly slower |
+| Realism | Educational | More realistic |
+
+---
+
 ## Core Modules
 
 ### `core/simulation2d.py`
@@ -296,6 +466,53 @@ Interaction potential wrappers:
 - `QuarticBond2D`: Quartic bond (GROMOS style)
 - `combining_rules()`: LJ parameter mixing
 - `plot_potential()`: Visualize potential curves
+
+---
+
+### `core/simulation3d.py`
+
+3D simulation engine (same physics, 3D space):
+- `Simulation3D`: 3D MD simulation class
+- `Particle3D`: 3D particle structure
+- `Bond3D`: 3D bonds
+- `Angle3D`: 3D angles
+
+**Same interface as 2D:**
+- All methods identical to `Simulation2D`
+- Just use 3D positions `[x, y, z]` instead of `[x, y]`
+- Temperature calculation accounts for 3 DOF
+
+---
+
+### `core/renderer3d.py`
+
+3D visualization:
+- `Renderer3D`: Standard 3D rendering with rotating view
+- `InteractiveRenderer3D`: Mouse-controlled rotation and zoom
+
+**Features:**
+- Matplotlib 3D projection
+- Rotatable camera (azimuth, elevation)
+- Interactive mouse controls
+- Box edge visualization
+- Energy plots (2D subplot)
+
+---
+
+### `core/movie_utils.py`
+
+Movie creation utilities:
+- `MovieRecorder`: Frame capture and export class
+- `record_simulation_movie()`: General movie recording
+- `make_quick_movie()`: Fast MP4 creation
+- `make_high_quality_movie()`: High FPS/DPI video
+- `make_gif_animation()`: Animated GIF export
+- `make_rotating_3d_movie()`: 360° rotation movie
+
+**Supported Formats:**
+- MP4 (via ffmpeg)
+- GIF (via Pillow)
+- PNG frame sequences
 
 ---
 
