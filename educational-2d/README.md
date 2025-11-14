@@ -55,11 +55,22 @@ This educational package provides simplified 2D and 3D molecular dynamics simula
 6. Gas in a cube (3D ideal gas with rotation)
 7. Water-like molecule (molecular vibrations in 3D)
 
+🎨 **Rendering & Visualization**
+8. Rendering styles demo (multiple visual representations)
+9. Publication-quality figures (high-resolution output)
+
 📓 **Interactive Notebooks**
 - Jupyter notebooks with step-by-step explanations
 - Interactive parameter exploration
 - Hands-on exercises
 - Lennard-Jones potential deep-dive
+
+🖼️ **Advanced Rendering Styles**
+- **Multiple visual representations**: spheres, halos, wireframes, ball-and-stick, space-filling
+- **Color schemes**: by velocity, temperature, energy, atom type, force magnitude
+- **Size scaling**: Van der Waals radii, custom scaling
+- **Transparency effects**: adjust opacity for clarity
+- **Publication-quality output**: 300 DPI, vector-compatible
 
 ---
 
@@ -421,6 +432,141 @@ for step in range(1000):
 
 ---
 
+## NEW: Advanced Rendering Styles 🎨
+
+### Multiple Visual Representations
+
+Choose from 8 different rendering styles for your particles:
+
+```python
+from core import ParticleRenderer, RenderStyle, ColorScheme
+
+# Create renderer with specific style
+renderer = ParticleRenderer(
+    style=RenderStyle.HALOS,           # Glowing spheres
+    color_scheme=ColorScheme.VELOCITY,  # Color by speed
+    size_scale=150.0,
+    alpha=0.8,
+    colormap='plasma'
+)
+
+# Render particles with style
+fig, ax = plt.subplots()
+renderer.render_particles_2d(ax, sim)
+```
+
+### Available Rendering Styles
+
+| Style | Description | Best For |
+|-------|-------------|----------|
+| **SPHERES** | Standard filled circles | General use, default |
+| **HALOS** | Glowing outer ring | Emphasis, visual appeal |
+| **WIREFRAME** | Hollow outlines | Overlapping particles |
+| **VELOCITY_ARROWS** | With velocity vectors | Showing motion |
+| **BALLS_AND_STICKS** | Small spheres + bonds | Molecular structures |
+| **SPACE_FILLING** | Large touching spheres | CPK models, density |
+| **VDW_RADII** | Sized by Van der Waals radii | Realistic sizes |
+| **POINTS** | Tiny dots | Many particles (N>1000) |
+
+### Color Schemes
+
+Visualize different properties through color:
+
+```python
+# Color by velocity
+renderer = ParticleRenderer(
+    style=RenderStyle.SPHERES,
+    color_scheme=ColorScheme.VELOCITY,  # blue=slow, red=fast
+    colormap='hot'
+)
+
+# Color by temperature
+renderer = ParticleRenderer(
+    style=RenderStyle.SPHERES,
+    color_scheme=ColorScheme.TEMPERATURE,  # local temperature
+    colormap='coolwarm'
+)
+
+# Color by kinetic energy
+renderer = ParticleRenderer(
+    style=RenderStyle.SPHERES,
+    color_scheme=ColorScheme.KINETIC_ENERGY,
+    colormap='viridis'
+)
+```
+
+### Available Color Schemes
+
+| Scheme | Property Visualized | Colormap |
+|--------|-------------------|----------|
+| **ATOM_TYPE** | Particle type (fixed colors) | Custom |
+| **VELOCITY** | Speed magnitude | Continuous |
+| **KINETIC_ENERGY** | Kinetic energy | Continuous |
+| **TEMPERATURE** | Local temperature | Continuous |
+| **FORCE** | Force magnitude | Continuous |
+| **CPK** | Standard molecular colors | Fixed |
+| **RAINBOW** | Index-based gradient | Gradient |
+
+### Example: Multi-Style Comparison
+
+```python
+from core import ParticleRenderer, RenderStyle, ColorScheme
+import matplotlib.pyplot as plt
+
+fig, axes = plt.subplots(2, 2, figsize=(12, 12))
+
+styles = [
+    (RenderStyle.SPHERES, ColorScheme.ATOM_TYPE),
+    (RenderStyle.HALOS, ColorScheme.VELOCITY),
+    (RenderStyle.BALLS_AND_STICKS, ColorScheme.ATOM_TYPE),
+    (RenderStyle.SPACE_FILLING, ColorScheme.TEMPERATURE)
+]
+
+for ax, (style, scheme) in zip(axes.flat, styles):
+    renderer = ParticleRenderer(style=style, color_scheme=scheme)
+    renderer.render_particles_2d(ax, sim)
+    renderer.render_bonds(ax, sim)
+
+plt.savefig('comparison.png', dpi=300)
+```
+
+### Publication-Quality Figures
+
+Create high-resolution figures for publications:
+
+```python
+# Set publication parameters
+plt.rcParams.update({
+    'font.size': 11,
+    'font.family': 'sans-serif',
+    'figure.dpi': 300,  # High resolution
+})
+
+# Create figure
+fig, ax = plt.subplots(figsize=(6, 6))
+
+# Use professional rendering
+renderer = ParticleRenderer(
+    style=RenderStyle.SPHERES,
+    color_scheme=ColorScheme.VELOCITY,
+    size_scale=120,
+    alpha=0.85,
+    colormap='plasma'
+)
+
+renderer.render_particles_2d(ax, sim)
+
+# Add colorbar
+from core.render_styles import create_colorbar
+create_colorbar(ax, renderer, sim, label="Velocity (nm/ps)")
+
+# Save high-resolution
+fig.savefig('figure.png', dpi=300, bbox_inches='tight')
+fig.savefig('figure.pdf')  # Vector format
+```
+
+---
+
 ## Core Modules
 
 ### `core/simulation2d.py`
@@ -513,6 +659,37 @@ Movie creation utilities:
 - MP4 (via ffmpeg)
 - GIF (via Pillow)
 - PNG frame sequences
+
+---
+
+### `core/render_styles.py`
+
+Advanced rendering styles:
+- `ParticleRenderer`: Multi-style particle renderer
+- `RenderStyle`: Enum of available styles (SPHERES, HALOS, WIREFRAME, etc.)
+- `ColorScheme`: Enum of color schemes (VELOCITY, TEMPERATURE, etc.)
+- `create_colorbar()`: Add colorbar for continuous schemes
+
+**Rendering Styles:**
+- 8 different visual representations
+- Size scaling (VDW radii, custom)
+- Transparency control
+- Bond rendering
+
+**Color Schemes:**
+- Fixed: ATOM_TYPE, CPK
+- Dynamic: VELOCITY, KINETIC_ENERGY, TEMPERATURE, FORCE
+- Gradient: RAINBOW, custom colormaps
+
+**Usage:**
+```python
+renderer = ParticleRenderer(
+    style=RenderStyle.HALOS,
+    color_scheme=ColorScheme.VELOCITY,
+    colormap='plasma'
+)
+renderer.render_particles_2d(ax, sim)
+```
 
 ---
 

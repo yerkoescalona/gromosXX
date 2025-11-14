@@ -33,6 +33,14 @@ from .movie_utils import (
     make_rotating_3d_movie
 )
 
+# Rendering styles
+from .render_styles import (
+    ParticleRenderer,
+    RenderStyle,
+    ColorScheme,
+    create_colorbar
+)
+
 __all__ = [
     # 2D
     'Simulation2D',
@@ -53,6 +61,11 @@ __all__ = [
     'make_high_quality_movie',
     'make_gif_animation',
     'make_rotating_3d_movie',
+    # Rendering styles
+    'ParticleRenderer',
+    'RenderStyle',
+    'ColorScheme',
+    'create_colorbar',
 ]
 
-__version__ = '2.0.0'
+__version__ = '2.1.0'
